@@ -1,0 +1,81 @@
+﻿@using Qulix.Models
+@model IEnumerable<Qulix.Models.Tasks>
+
+@{
+    ViewBag.Title = "Tasks";
+}
+
+<h2>Задачи по проекту</h2>
+
+<p>
+    @Html.ActionLink("Добавить задачу", "Create")
+</p>
+<table>
+    <tr>
+        <th>
+            Номер
+        </th>
+        <th>
+            Название
+        </th>
+        <th>
+            Объем работы
+        </th>
+        <th>
+            Начата
+        </th>
+        <th>
+            Закончена
+        </th>
+        <th>
+            Статус
+        </th>
+        <th>
+            Исполнитель
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.TaskId)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Title)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Job)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.StartedOn)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Finished)
+        </td>
+        <td>
+            @foreach (States st in (IEnumerable<States>)ViewData["States"])
+            {
+                if (item.StateId==st.StateId)
+                {
+                   @st.Title
+                }
+            }
+        </td>
+        <td>
+            @foreach(Users usr in (IEnumerable<Users>)ViewData["Users"])
+            {
+                if (item.PersonId==usr.UserId)
+                {
+                    @usr.FirstName
+                }
+            }
+        </td>
+        <td>
+            @Html.ActionLink("Изменить", "Edit", new {id=item.TaskId}) |
+            @Html.ActionLink("Удалить", "Delete", new {id=item.TaskId}, new{onclick="return confirm('Вы уверены?');"})
+        </td>
+    </tr>
+}
+
+</table>

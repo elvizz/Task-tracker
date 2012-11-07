@@ -1,0 +1,206 @@
+USE [master]
+GO
+
+/****** Object:  Database [qulixdb]    Script Date: 10/07/2012 13:19:28 ******/
+CREATE DATABASE [qulixdb] ON  PRIMARY 
+( NAME = N'qulixdb', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQL\DATA\qulixdb.mdf' , SIZE = 3072KB , MAXSIZE = UNLIMITED, FILEGROWTH = 1024KB )
+ LOG ON 
+( NAME = N'qulixdb_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQL\DATA\qulixdb_1.ldf' , SIZE = 1024KB , MAXSIZE = 2048GB , FILEGROWTH = 10%)
+GO
+
+ALTER DATABASE [qulixdb] SET COMPATIBILITY_LEVEL = 100
+GO
+
+IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
+begin
+EXEC [qulixdb].[dbo].[sp_fulltext_database] @action = 'enable'
+end
+GO
+
+ALTER DATABASE [qulixdb] SET ANSI_NULL_DEFAULT OFF 
+GO
+
+ALTER DATABASE [qulixdb] SET ANSI_NULLS OFF 
+GO
+
+ALTER DATABASE [qulixdb] SET ANSI_PADDING OFF 
+GO
+
+ALTER DATABASE [qulixdb] SET ANSI_WARNINGS OFF 
+GO
+
+ALTER DATABASE [qulixdb] SET ARITHABORT OFF 
+GO
+
+ALTER DATABASE [qulixdb] SET AUTO_CLOSE OFF 
+GO
+
+ALTER DATABASE [qulixdb] SET AUTO_CREATE_STATISTICS ON 
+GO
+
+ALTER DATABASE [qulixdb] SET AUTO_SHRINK OFF 
+GO
+
+ALTER DATABASE [qulixdb] SET AUTO_UPDATE_STATISTICS ON 
+GO
+
+ALTER DATABASE [qulixdb] SET CURSOR_CLOSE_ON_COMMIT OFF 
+GO
+
+ALTER DATABASE [qulixdb] SET CURSOR_DEFAULT  GLOBAL 
+GO
+
+ALTER DATABASE [qulixdb] SET CONCAT_NULL_YIELDS_NULL OFF 
+GO
+
+ALTER DATABASE [qulixdb] SET NUMERIC_ROUNDABORT OFF 
+GO
+
+ALTER DATABASE [qulixdb] SET QUOTED_IDENTIFIER OFF 
+GO
+
+ALTER DATABASE [qulixdb] SET RECURSIVE_TRIGGERS OFF 
+GO
+
+ALTER DATABASE [qulixdb] SET  DISABLE_BROKER 
+GO
+
+ALTER DATABASE [qulixdb] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
+GO
+
+ALTER DATABASE [qulixdb] SET DATE_CORRELATION_OPTIMIZATION OFF 
+GO
+
+ALTER DATABASE [qulixdb] SET TRUSTWORTHY OFF 
+GO
+
+ALTER DATABASE [qulixdb] SET ALLOW_SNAPSHOT_ISOLATION OFF 
+GO
+
+ALTER DATABASE [qulixdb] SET PARAMETERIZATION SIMPLE 
+GO
+
+ALTER DATABASE [qulixdb] SET READ_COMMITTED_SNAPSHOT OFF 
+GO
+
+ALTER DATABASE [qulixdb] SET HONOR_BROKER_PRIORITY OFF 
+GO
+
+ALTER DATABASE [qulixdb] SET  READ_WRITE 
+GO
+
+ALTER DATABASE [qulixdb] SET RECOVERY FULL 
+GO
+
+ALTER DATABASE [qulixdb] SET  MULTI_USER 
+GO
+
+ALTER DATABASE [qulixdb] SET PAGE_VERIFY CHECKSUM  
+GO
+
+ALTER DATABASE [qulixdb] SET DB_CHAINING OFF 
+GO
+
+
+USE [qulixdb]
+GO
+
+/****** Object:  Table [dbo].[States]    Script Date: 10/07/2012 13:21:37 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[States](
+	[StateId] [int] IDENTITY(1,1) NOT NULL,
+	[Title] [nvarchar](50) NULL,
+ CONSTRAINT [PK_States] PRIMARY KEY CLUSTERED 
+(
+	[StateId] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+
+USE [qulixdb]
+GO
+
+/****** Object:  Table [dbo].[Users]    Script Date: 10/07/2012 13:21:50 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[Users](
+	[UserId] [uniqueidentifier] NOT NULL,
+	[FirstName] [nvarchar](50) NOT NULL,
+	[LastName] [nvarchar](50) NOT NULL,
+	[ThirdName] [nvarchar](50) NOT NULL,
+ CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED 
+(
+	[UserId] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[Users] ADD  CONSTRAINT [DF_Users_UserId]  DEFAULT (newid()) FOR [UserId]
+GO
+
+
+USE [qulixdb]
+GO
+
+/****** Object:  Table [dbo].[Tasks]    Script Date: 10/07/2012 13:21:43 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[Tasks](
+	[TaskId] [uniqueidentifier] NOT NULL,
+	[Title] [nvarchar](100) NOT NULL,
+	[Job] [nvarchar](max) NULL,
+	[StartedOn] [date] NOT NULL,
+	[Finished] [date] NOT NULL,
+	[StateId] [int] NOT NULL,
+	[PersonId] [uniqueidentifier] NOT NULL,
+ CONSTRAINT [PK_Tasks] PRIMARY KEY CLUSTERED 
+(
+	[TaskId] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[Tasks]  WITH CHECK ADD  CONSTRAINT [FK_Tasks_States] FOREIGN KEY([StateId])
+REFERENCES [dbo].[States] ([StateId])
+GO
+
+ALTER TABLE [dbo].[Tasks] CHECK CONSTRAINT [FK_Tasks_States]
+GO
+
+ALTER TABLE [dbo].[Tasks]  WITH CHECK ADD  CONSTRAINT [FK_Tasks_Users] FOREIGN KEY([PersonId])
+REFERENCES [dbo].[Users] ([UserId])
+GO
+
+ALTER TABLE [dbo].[Tasks] CHECK CONSTRAINT [FK_Tasks_Users]
+GO
+
+ALTER TABLE [dbo].[Tasks] ADD  CONSTRAINT [DF_Tasks_Id]  DEFAULT (newid()) FOR [TaskId]
+GO
+
+ALTER TABLE [dbo].[Tasks] ADD  CONSTRAINT [DF_Tasks_StartedOn]  DEFAULT (getdate()) FOR [StartedOn]
+GO
+
+ALTER TABLE [dbo].[Tasks] ADD  CONSTRAINT [DF_Tasks_Finished]  DEFAULT (getdate()) FOR [Finished]
+GO
+
+ALTER TABLE [dbo].[Tasks] ADD  CONSTRAINT [DF_Tasks_StateId]  DEFAULT ((1)) FOR [StateId]
+GO
+
+
